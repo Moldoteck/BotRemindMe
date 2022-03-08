@@ -5,9 +5,9 @@ import { v4 as uuidv4 } from 'uuid'
 
 export default async function handleRemind(ctx: Context) {
   if (ctx.msg?.text) {
-    let text: string = ctx.msg.text.split('/remindme ')[1]
+    let text: string = ctx.msg.text.split('/remindme@BotRemindMeBot ')[1]
     if (!text) {
-      text = ctx.msg.text.split('/remindme@BotRemindMeBot ')[1]
+      text = ctx.msg.text.split('/remindme ')[1]
     }
     if (text) {
       let textArray = text.split(' ')
