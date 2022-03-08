@@ -17,7 +17,7 @@ export default async function handleRemind(ctx: Context) {
       if (quantity && unit) {
         let numQuantity = parseInt(quantity)
         let dateNumber = 0
-        if (numQuantity) {
+        if (numQuantity && numQuantity < 1000) {
           let date = new Date(Date.now())
           let informationSet = false
           let timeoutSeconds = 0
@@ -107,7 +107,7 @@ export default async function handleRemind(ctx: Context) {
             }, timeoutSeconds)
           }
         } else {
-          ctx.reply('Invalid number').catch((err) => {
+          ctx.reply('Invalid number or too big').catch((err) => {
             console.log(err)
           })
         }
