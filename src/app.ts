@@ -12,7 +12,7 @@ import i18n from '@/helpers/i18n'
 import languageMenu from '@/menus/language'
 import sendHelp from '@/handlers/help'
 import startMongo from '@/helpers/startMongo'
-import handleRemind from './handlers/reminder'
+import handleRemind, { handleTextRemind } from './handlers/reminder'
 import { sendAllMessages } from './helpers/sendReminder'
 
 async function runApp() {
@@ -33,6 +33,8 @@ async function runApp() {
   bot.command(['help', 'start'], sendHelp)
   bot.command('language', handleLanguage)
   bot.command('remindme', handleRemind)
+  bot.on('msg:text', handleTextRemind)
+
   // Errors
   bot.catch(console.error)
   // Start bot

@@ -6,5 +6,6 @@ help: |
   Supported time units are <b>s</b>econds, <b>m</b>inutes, <b>h</b>ours, <b>d</b>ays
   Supported texts are: s, sec, second, seconds, m, min, minute, minutes, h, hr, hour, hours, d, day, days
   You can also use <b>/remindme</b> as reply to some message, so that both your message and reminder will be saved.
+  You can also use <b>!remindme</b> if you want
 language: Please, select the language.
 language_selected: <b>This bot</b> now speaks English.
