@@ -21,12 +21,14 @@
     "envalid": "^7.2.2",
     "grammy": "^1.5.0",
     "grammy-middlewares": "^1.0.11",
+    "mongo-sanitize": "^1.1.0",
     "mongoose": "^6.1.0",
     "uuid": "^8.3.2"
   },
   "devDependencies": {
     "@typegoose/typegoose": "^9.3.1",
     "@types/js-yaml": "^4.0.5",
+    "@types/mongo-sanitize": "^1.0.1",
     "@types/node": "^16.11.12",
     "@types/uuid": "^8.3.4",
     "@typescript-eslint/eslint-plugin": "^5.6.0",

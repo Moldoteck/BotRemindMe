@@ -2,6 +2,7 @@ import { sendMessageTimeout } from '@/helpers/sendReminder'
 import Context from '@/models/Context'
 import { MessageChat, MessageDate, MessageReply } from '@/models/User'
 import { v4 as uuidv4 } from 'uuid'
+var sanitize = require('mongo-sanitize')
 
 async function handleMsg(ctx: Context, text: string) {
   if (ctx.msg) {
@@ -62,13 +63,16 @@ async function handleMsg(ctx: Context, text: string) {
           if (!message) {
             message = '-'
           }
+          message = sanitize(message)
           if (ctx.msg.reply_to_message && ctx.msg.reply_to_message.text) {
             let uname = ctx.msg.reply_to_message.from?.username
             let unames = ''
             if (uname) {
               unames = `@${uname}: `
             }
-            reminderMsg[message] = `${unames}${ctx.msg.reply_to_message.text}`
+            let re = ctx.msg.reply_to_message.text
+            re = sanitize(re)
+            reminderMsg[message] = `${unames}${re}`
             reminderObj[dateNumber] = reminderMsg
           } else {
             reminderMsg[message] = ''
