@@ -90,9 +90,10 @@ export default async function handleRemind(ctx: Context) {
               ? `\n\n${reminderObj[dateNumber][message]}`
               : ''
 
+            let msg = message == '-' ? '' : `\n\n${message}`
             let username =
               ctx.dbuser.username != '' ? ` @${ctx.dbuser.username}` : ''
-            let finalMessage = `Reminder for${username}:\n\n${message}${repl}`
+            let finalMessage = `Reminder for${username}:${msg}${repl}`
             let chatid = ctx.msg.chat.id
 
             setTimeout(() => {
