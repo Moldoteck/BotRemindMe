@@ -68,7 +68,12 @@ export default async function handleRemind(ctx: Context) {
               message = '-'
             }
             if (ctx.msg.reply_to_message && ctx.msg.reply_to_message.text) {
-              reminderMsg[message] = ctx.msg.reply_to_message.text
+              let uname = ctx.msg.reply_to_message.from?.username
+              let unames = ''
+              if (uname) {
+                unames = `@${uname}: `
+              }
+              reminderMsg[message] = `${unames}${ctx.msg.reply_to_message.text}`
               reminderObj[dateNumber] = reminderMsg
             } else {
               reminderMsg[message] = ''
