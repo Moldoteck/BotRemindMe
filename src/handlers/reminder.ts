@@ -6,12 +6,15 @@ import { v4 as uuidv4 } from 'uuid'
 export default async function handleRemind(ctx: Context) {
   if (ctx.msg?.text) {
     let text: string = ctx.msg.text.split('/remindme ')[1]
+    if (!text) {
+      text = ctx.msg.text.split('/remindme@BotRemindMeBot ')[1]
+    }
     if (text) {
       let textArray = text.split(' ')
       let quantity = textArray[0]
       let unit = textArray[1]
       let message = textArray.slice(2).join(' ')
-      if (quantity && unit && message) {
+      if (quantity && unit) {
         let numQuantity = parseInt(quantity)
         let dateNumber = 0
         if (numQuantity) {
@@ -61,7 +64,9 @@ export default async function handleRemind(ctx: Context) {
             let reminderObj: MessageDate = {}
             let reminderChat: MessageChat = {}
             let reminderMsg: MessageReply = {}
-
+            if (!message) {
+              message = '-'
+            }
             if (ctx.msg.reply_to_message && ctx.msg.reply_to_message.text) {
               reminderMsg[message] = ctx.msg.reply_to_message.text
               reminderObj[dateNumber] = reminderMsg
