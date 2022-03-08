@@ -31,14 +31,13 @@ export async function sendMessageChat(
   messageID: string
 ) {
   let userID = user.id
-  let chatId = Object.keys(reminder)[0]
-  let timeout = Object.keys(reminder[chatId])[0]
+  let chatId = reminder.chatID
+  let timeout = reminder.dateNumber
   let timeoutNumber = parseInt(timeout)
-  let messageObj = reminder[chatId][timeout]
 
   //message and reply
-  let message = Object.keys(messageObj)[0]
-  let reply = messageObj[message]
+  let message = reminder.message
+  let reply = reminder.reply
 
   let msg = message == '-' ? '' : `\n\n${message}`
   let repl = reply ? `\n\n${reply}` : ''
@@ -60,11 +59,22 @@ export async function sendMessageTimeout(
   userid: number,
   reminderid: string
 ) {
-  await ctx.api.sendMessage(chatId, message).catch((err) => {
-    console.log(err)
-  })
-
   let user = await findOrCreateUser(userid)
+  try {
+    let msg = message.replace('<', '&lt;')
+    msg = message.replace('>', '&gt;')
+    msg = message.replace('&', '&amp;')
+    msg = msg.split(':').slice(1).join(':')
+    msg = `<span class="tg-spoiler">${msg}</span>`
+
+    await ctx.api.sendMessage(chatId, message.split(':')[0] + msg, {
+      reply_to_message_id: parseInt(user.reminders[reminderid].message_id),
+      parse_mode: 'HTML',
+    })
+  } catch (err: any) {
+    console.log(err)
+  }
+
   delete user.reminders[reminderid]
   user.markModified('reminders')
   await user.save()

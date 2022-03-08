@@ -1,6 +1,6 @@
 import { sendMessageTimeout } from '@/helpers/sendReminder'
 import Context from '@/models/Context'
-import { MessageChat, MessageDate, MessageReply } from '@/models/User'
+import { MessageChat } from '@/models/User'
 import { v4 as uuidv4 } from 'uuid'
 var sanitize = require('mongo-sanitize')
 
@@ -12,6 +12,7 @@ async function handleMsg(ctx: Context, text: string) {
     let message = textArray.slice(2).join(' ')
     if (quantity && unit) {
       let numQuantity = parseInt(quantity)
+      numQuantity = Math.abs(numQuantity)
       let dateNumber = 0
       if (numQuantity && numQuantity < 1000) {
         let date = new Date(Date.now())
@@ -57,13 +58,18 @@ async function handleMsg(ctx: Context, text: string) {
         }
         if (informationSet) {
           dateNumber = date.getTime()
-          let reminderObj: MessageDate = {}
-          let reminderChat: MessageChat = {}
-          let reminderMsg: MessageReply = {}
           if (!message) {
             message = '-'
           }
           message = sanitize(message)
+
+          let reminderChat: MessageChat = {
+            chatID: ctx.msg.chat.id.toString(),
+            message: message,
+            reply: '',
+            dateNumber: dateNumber.toString(),
+          }
+
           if (ctx.msg.reply_to_message && ctx.msg.reply_to_message.text) {
             let uname = ctx.msg.reply_to_message.from?.username
             let unames = ''
@@ -72,22 +78,23 @@ async function handleMsg(ctx: Context, text: string) {
             }
             let re = ctx.msg.reply_to_message.text
             re = sanitize(re)
-            reminderMsg[message] = `${unames}${re}`
-            reminderObj[dateNumber] = reminderMsg
-          } else {
-            reminderMsg[message] = ''
-            reminderObj[dateNumber] = reminderMsg
+            reminderChat.message = message
+            reminderChat.reply = `${unames}${re}`
           }
-          reminderChat[ctx.msg.chat.id] = reminderObj
 
           let uniqueId = uuidv4()
           ctx.dbuser.reminders[uniqueId] = reminderChat
+          ctx.dbuser.reminders[uniqueId] = {
+            chatID: ctx.msg.chat.id.toString(),
+            message: '',
+            reply: '',
+            dateNumber: dateNumber.toString(),
+            message_id: ctx.msg.message_id.toString(),
+          }
           //mark modified
           ctx.dbuser.markModified('reminders')
           await ctx.dbuser.save()
-          let repl = reminderObj[dateNumber][message]
-            ? `\n\n${reminderObj[dateNumber][message]}`
-            : ''
+          let repl = reminderChat.reply ? `\n\n${reminderChat.reply}` : ''
 
           let msg = message == '-' ? '' : `\n\n${message}`
           let username =
@@ -119,8 +126,6 @@ async function handleMsg(ctx: Context, text: string) {
 }
 
 export default async function handleRemind(ctx: Context) {
-  console.log('handleRemind')
-  console.log(ctx.msg)
   if (ctx.msg?.text) {
     let text: string = ctx.msg.text.split('/remindme@BotRemindMeBot ')[1]
     if (!text) {

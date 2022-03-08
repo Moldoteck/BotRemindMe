@@ -1,18 +1,8 @@
 import { getModelForClass, modelOptions, prop } from '@typegoose/typegoose'
 
-//text and reply
-export interface MessageReply {
-  [key: string]: string
-}
-
-//timeout
-export interface MessageDate {
-  [key: string]: MessageReply
-}
-
 //chat id
 export interface MessageChat {
-  [key: string]: MessageDate
+  [key: string]: string
 }
 
 //message id
