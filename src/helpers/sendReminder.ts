@@ -40,9 +40,10 @@ export async function sendMessageChat(
   let message = Object.keys(messageObj)[0]
   let reply = messageObj[message]
 
+  let msg = message == '-' ? '' : `\n\n${message}`
   let repl = reply ? `\n\n${reply}` : ''
   let username = user.username != '' ? ` @${user.username}` : ''
-  let finalMessage = `Reminder for ${username}:\n\n${message}\n\n${repl}`
+  let finalMessage = `Reminder for ${username}:${msg}${repl}`
   if (Date.now() > timeoutNumber) {
     sendMessageTimeout(ctx, chatId, finalMessage, userID, messageID)
   } else {
