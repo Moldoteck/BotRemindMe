@@ -119,6 +119,8 @@ async function handleMsg(ctx: Context, text: string) {
 }
 
 export default async function handleRemind(ctx: Context) {
+  console.log('handleRemind')
+  console.log(ctx.msg)
   if (ctx.msg?.text) {
     let text: string = ctx.msg.text.split('/remindme@BotRemindMeBot ')[1]
     if (!text) {
