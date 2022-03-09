@@ -102,6 +102,11 @@ async function handleMsg(ctx: Context, text: string) {
           let finalMessage = `Reminder for${username}:${msg}${repl}`
           let chatid = ctx.msg.chat.id
 
+          ctx
+            .reply('Ok', { reply_to_message_id: ctx.msg.message_id })
+            .catch((err) => {
+              console.log(err)
+            })
           setTimeout(() => {
             sendMessageTimeout(
               ctx,
