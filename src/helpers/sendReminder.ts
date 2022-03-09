@@ -61,15 +61,18 @@ export async function sendMessageTimeout(
 ) {
   let user = await findOrCreateUser(userid)
   try {
-    let msg = message.replace('<', '&lt;')
-    msg = message.replace('>', '&gt;')
-    msg = message.replace('&', '&amp;')
-    msg = msg.split(':').slice(1).join(':')
-    msg = `<span class="tg-spoiler">${msg}</span>`
+    // let msg = message.replace('<', '&lt;')
+    // msg = message.replace('>', '&gt;')
+    // msg = message.replace('&', '&amp;')
+    // msg = msg.split(':').slice(1).join(':')
+    // msg = `<span class="tg-spoiler">${msg}</span>`
 
-    await ctx.api.sendMessage(chatId, message.split(':')[0] + msg, {
+    // await ctx.api.sendMessage(chatId, message.split(':')[0] + msg, {
+    //   reply_to_message_id: parseInt(user.reminders[reminderid].message_id),
+    //   parse_mode: 'HTML',
+    // })
+    await ctx.api.sendMessage(chatId, message, {
       reply_to_message_id: parseInt(user.reminders[reminderid].message_id),
-      parse_mode: 'HTML',
     })
   } catch (err: any) {
     console.log(err)
