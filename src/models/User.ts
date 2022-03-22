@@ -29,7 +29,7 @@ const UserModel = getModelForClass(User)
 export function findOrCreateUser(id: number) {
   return UserModel.findOneAndUpdate(
     { id },
-    {},
+    { username: `${id}` },
     {
       upsert: true,
       new: true,
