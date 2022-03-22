@@ -76,6 +76,11 @@ export async function sendMessageTimeout(
     })
   } catch (err: any) {
     console.log(err)
+    try {
+      await ctx.api.sendMessage(chatId, message)
+    } catch (err: any) {
+      console.log(err)
+    }
   }
 
   delete user.reminders[reminderid]
