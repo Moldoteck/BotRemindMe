@@ -6,6 +6,7 @@ import {
   User,
 } from '@/models/User'
 import Context from '@/models/Context'
+import { recursiveTimeout } from '@/handlers/reminder'
 
 export async function sendAllMessages(ctx: Bot<Context, Api<RawApi>>) {
   let users = await findAllUsers()
@@ -46,7 +47,7 @@ export async function sendMessageChat(
   if (Date.now() > timeoutNumber) {
     sendMessageTimeout(ctx, chatId, finalMessage, userID, messageID)
   } else {
-    setTimeout(() => {
+    recursiveTimeout(() => {
       sendMessageTimeout(ctx, chatId, finalMessage, userID, messageID)
     }, timeoutNumber - Date.now())
   }

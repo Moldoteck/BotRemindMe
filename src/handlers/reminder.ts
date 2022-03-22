@@ -4,6 +4,17 @@ import { MessageChat } from '@/models/User'
 import { v4 as uuidv4 } from 'uuid'
 var sanitize = require('mongo-sanitize')
 
+export function recursiveTimeout(func: () => void, timeout: number) {
+  if (timeout > 0x7fffffff)
+    //setTimeout limit is MAX_INT32=(2^31-1)
+    setTimeout(function () {
+      recursiveTimeout(func, timeout - 0x7fffffff)
+    }, 0x7fffffff)
+  else {
+    setTimeout(func, timeout)
+  }
+}
+
 async function handleMsg(ctx: Context, text: string) {
   if (ctx.msg) {
     let textArray = text.split(' ')
@@ -46,12 +57,12 @@ async function handleMsg(ctx: Context, text: string) {
           case 'd':
           case 'day':
           case 'days':
-            date.setHours(date.getHours() + numQuantity * 24)
+            date.setDate(date.getDate() + numQuantity)
             informationSet = true
             timeoutSeconds = numQuantity * 1000 * 60 * 60 * 24
             break
           default:
-            ctx.reply('Invalid unit').catch((err) => {
+            ctx.reply('Invalid unit type').catch((err) => {
               console.log(err)
             })
             break
@@ -107,7 +118,8 @@ async function handleMsg(ctx: Context, text: string) {
             .catch((err) => {
               console.log(err)
             })
-          setTimeout(() => {
+
+          recursiveTimeout(() => {
             sendMessageTimeout(
               ctx,
               chatid.toString(),
