@@ -15,12 +15,13 @@ export async function handleCount(ctx: Context) {
     for (let element of chats) {
       console.log(element)
       try {
-        users_tot += await ctx.getChatMemberCount(element.id)
+        users_tot += await ctx.api.getChatMemberCount(element.id)
         chat_nr += 1
       } catch (err) {
         console.log(err)
         users_pr += 1
       }
+      await new Promise((resolve) => setTimeout(resolve, 300))
     }
     ctx.reply('Total users ' + users_tot)
     ctx.reply('Private Users ' + users_pr)
