@@ -10,10 +10,11 @@ import configureI18n from '@/middlewares/configureI18n'
 import handleLanguage from '@/handlers/language'
 import i18n from '@/helpers/i18n'
 import languageMenu from '@/menus/language'
-import sendHelp from '@/handlers/help'
+import sendHelp, { handleCount } from '@/handlers/help'
 import startMongo from '@/helpers/startMongo'
 import handleRemind, { handleTextRemind } from './handlers/reminder'
 import { sendAllMessages } from './helpers/sendReminder'
+import attachChat from './middlewares/attachChat'
 
 async function runApp() {
   console.log('Starting app...')
@@ -25,6 +26,7 @@ async function runApp() {
     .use(sequentialize())
     .use(ignoreOld())
     .use(attachUser)
+    .use(attachChat)
     .use(i18n.middleware())
     .use(configureI18n)
     // Menus
@@ -33,6 +35,7 @@ async function runApp() {
   bot.command(['help', 'start'], sendHelp)
   bot.command('language', handleLanguage)
   bot.command('remindme', handleRemind)
+  bot.command('countChats', handleCount)
   bot.on('msg:text', handleTextRemind)
 
   // Errors
