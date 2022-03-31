@@ -7,7 +7,7 @@ export default function handleHelp(ctx: Context) {
 }
 
 export async function handleCount(ctx: Context) {
-  if (ctx.msg.from?.id == 180001222) {
+  if (ctx?.from?.id == 180001222) {
     let chats = await findAllChats()
     let users_tot = 0
     let chat_nr = 0
