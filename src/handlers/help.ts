@@ -7,24 +7,34 @@ export default function handleHelp(ctx: Context) {
 }
 
 export async function handleCount(ctx: Context) {
-  if (ctx?.from?.id == 180001222) {
+  if (ctx.msg.from?.id == 180001222) {
     let chats = await findAllChats()
     let users_tot = 0
     let chat_nr = 0
     let users_pr = 0
     for (let element of chats) {
-      console.log(element)
       try {
-        users_tot += await ctx.api.getChatMemberCount(element.id)
-        chat_nr += 1
+        let chatObj = await ctx.api.getChat(element.id)
+        if (chatObj.type == 'private') {
+          users_pr += 1
+        } else {
+          chat_nr += 1
+          users_tot += await ctx.api.getChatMemberCount(element.id)
+        }
       } catch (err) {
         console.log(err)
-        users_pr += 1
       }
-      await new Promise((resolve) => setTimeout(resolve, 300))
+      await new Promise((resolve) => setTimeout(resolve, 100))
     }
-    ctx.reply('Total users ' + users_tot)
-    ctx.reply('Private Users ' + users_pr)
-    ctx.reply('Chats ' + chat_nr)
+    ctx
+      .reply(
+        'Chat users ' +
+          users_tot +
+          '\nPrivate Users ' +
+          users_pr +
+          '\nChats ' +
+          chat_nr
+      )
+      .catch((err) => console.log(err))
   }
 }
