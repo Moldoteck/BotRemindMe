@@ -81,13 +81,18 @@ async function handleMsg(ctx: Context, text: string) {
             dateNumber: dateNumber.toString(),
           }
 
-          if (ctx.msg.reply_to_message && ctx.msg.reply_to_message.text) {
+          if (
+            ctx.msg.reply_to_message &&
+            (ctx.msg.reply_to_message.text || ctx.msg.reply_to_message.caption)
+          ) {
             let uname = ctx.msg.reply_to_message.from?.username
             let unames = ''
             if (uname) {
               unames = `@${uname}: `
             }
             let re = ctx.msg.reply_to_message.text
+              ? ctx.msg.reply_to_message.text
+              : ctx.msg.reply_to_message.caption
             re = sanitize(re)
             reminderChat.message = message
             reminderChat.reply = `${unames}${re}`
