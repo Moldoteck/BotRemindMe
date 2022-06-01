@@ -79,6 +79,7 @@ async function handleMsg(ctx: Context, text: string) {
             message: message,
             reply: '',
             dateNumber: dateNumber.toString(),
+            message_id: ctx.msg.message_id.toString(),
           }
 
           if (
@@ -94,19 +95,12 @@ async function handleMsg(ctx: Context, text: string) {
               ? ctx.msg.reply_to_message.text
               : ctx.msg.reply_to_message.caption
             re = sanitize(re)
-            reminderChat.message = message
             reminderChat.reply = `${unames}${re}`
           }
 
           let uniqueId = uuidv4()
           ctx.dbuser.reminders[uniqueId] = reminderChat
-          ctx.dbuser.reminders[uniqueId] = {
-            chatID: ctx.msg.chat.id.toString(),
-            message: '',
-            reply: '',
-            dateNumber: dateNumber.toString(),
-            message_id: ctx.msg.message_id.toString(),
-          }
+
           //mark modified
           ctx.dbuser.markModified('reminders')
           await ctx.dbuser.save()

@@ -19,9 +19,9 @@ export async function sendMessageUser(
   ctx: Bot<Context, Api<RawApi>>,
   user: User
 ) {
-  let messageIDs = Object.keys(user.reminders)
-  for (let messageID of messageIDs) {
-    sendMessageChat(ctx, user.reminders[messageID], user, messageID)
+  let uniqueIDs = Object.keys(user.reminders)
+  for (let uniqueID of uniqueIDs) {
+    sendMessageChat(ctx, user.reminders[uniqueID], user, uniqueID)
   }
 }
 
@@ -29,7 +29,7 @@ export async function sendMessageChat(
   ctx: Bot<Context, Api<RawApi>>,
   reminder: MessageChat,
   user: User,
-  messageID: string
+  uniqueID: string
 ) {
   let userID = user.id
   let chatId = reminder.chatID
@@ -45,10 +45,10 @@ export async function sendMessageChat(
   let username = user.username != '' ? ` @${user.username}` : ''
   let finalMessage = `Reminder for ${username}:${msg}${repl}`
   if (Date.now() > timeoutNumber) {
-    sendMessageTimeout(ctx, chatId, finalMessage, userID, messageID)
+    sendMessageTimeout(ctx, chatId, finalMessage, userID, uniqueID)
   } else {
     recursiveTimeout(() => {
-      sendMessageTimeout(ctx, chatId, finalMessage, userID, messageID)
+      sendMessageTimeout(ctx, chatId, finalMessage, userID, uniqueID)
     }, timeoutNumber - Date.now())
   }
 }
