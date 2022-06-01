@@ -26,3 +26,4 @@ Also, please, consider looking at `.env.sample`.
 MIT — use for any purpose. Would be great if you could leave a note about the original developers. Thanks!
 
 Inspired from here: https://github.com/backmeupplz/telegraf-template
+ 
