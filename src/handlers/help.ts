@@ -28,7 +28,10 @@ export async function handleCount(ctx: Context) {
           })
         }
       } catch (err: any) {
-        if (err.includes('kicked') || err.message.includes('not found')) {
+        if (
+          err.message.includes('kicked') ||
+          err.message.includes('not found')
+        ) {
           await deleteChat(element.id)
         }
         console.log(err)
