@@ -15,8 +15,13 @@ export async function handleCount(ctx: Context) {
     for (let element of chats) {
       try {
         let chatObj = await customFunction(async () => {
-          let ch = await ctx.api.getChat(element.id)
-          return ch ? ch : undefined
+          let ch = undefined
+          try {
+            ch = await ctx.api.getChat(element.id)
+          } catch (err: any) {
+            console.log(err)
+          }
+          return ch
         })
         if (!chatObj) {
           continue
@@ -26,8 +31,13 @@ export async function handleCount(ctx: Context) {
         } else {
           chat_nr += 1
           users_tot += await customFunction(async () => {
-            let ch = await ctx.api.getChatMemberCount(element.id)
-            return ch ? ch : 0
+            let ch = 0
+            try {
+              ch = await ctx.api.getChatMemberCount(element.id)
+            } catch (err: any) {
+              console.log(err)
+            }
+            return ch
           })
         }
       } catch (err: any) {
