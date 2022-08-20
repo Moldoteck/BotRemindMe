@@ -1,6 +1,6 @@
 import Context from '@/models/Context'
 import sendOptions from '@/helpers/sendOptions'
-import { findAllChats } from '@/models/Chat'
+import { deleteChat, findAllChats } from '@/models/Chat'
 
 export default function handleHelp(ctx: Context) {
   return ctx.replyWithLocalization('help', sendOptions(ctx))
@@ -15,17 +15,22 @@ export async function handleCount(ctx: Context) {
     for (let element of chats) {
       try {
         let chatObj = await customFunction(async () => {
-          return await ctx.api.getChat(element.id)
+          let ch = await ctx.api.getChat(element.id)
+          return ch ? ch : 0
         })
         if (chatObj.type == 'private') {
           users_pr += 1
         } else {
           chat_nr += 1
           users_tot += await customFunction(async () => {
-            return await ctx.api.getChatMemberCount(element.id)
+            let ch = await ctx.api.getChatMemberCount(element.id)
+            return ch ? ch : 0
           })
         }
-      } catch (err) {
+      } catch (err: any) {
+        if (err.includes('kicked') || err.message.includes('not found')) {
+          await deleteChat(element.id)
+        }
         console.log(err)
       }
     }
