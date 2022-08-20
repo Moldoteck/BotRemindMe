@@ -19,7 +19,16 @@ export async function handleCount(ctx: Context) {
           try {
             ch = await ctx.api.getChat(element.id)
           } catch (err: any) {
-            console.log(err)
+            if (
+              err.message.includes('kicked') ||
+              err.message.includes('not found')
+            ) {
+              deleteChat(element.id).catch((err: any) => {
+                console.log(err)
+              })
+            } else {
+              console.log(err)
+            }
           }
           return ch
         })
@@ -35,7 +44,16 @@ export async function handleCount(ctx: Context) {
             try {
               ch = await ctx.api.getChatMemberCount(element.id)
             } catch (err: any) {
-              console.log(err)
+              if (
+                err.message.includes('kicked') ||
+                err.message.includes('not found')
+              ) {
+                deleteChat(element.id).catch((err: any) => {
+                  console.log(err)
+                })
+              } else {
+                console.log(err)
+              }
             }
             return ch
           })
