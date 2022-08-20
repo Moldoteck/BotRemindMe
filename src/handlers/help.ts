@@ -16,8 +16,11 @@ export async function handleCount(ctx: Context) {
       try {
         let chatObj = await customFunction(async () => {
           let ch = await ctx.api.getChat(element.id)
-          return ch ? ch : 0
+          return ch ? ch : undefined
         })
+        if (!chatObj) {
+          continue
+        }
         if (chatObj.type == 'private') {
           users_pr += 1
         } else {
@@ -33,8 +36,9 @@ export async function handleCount(ctx: Context) {
           err.message.includes('not found')
         ) {
           await deleteChat(element.id)
+        } else {
+          console.log(err)
         }
-        console.log(err)
       }
     }
     ctx
