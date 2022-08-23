@@ -61,7 +61,6 @@ async function handleMsg(ctx: Context, text: string) {
             informationSet = true
             timeoutSeconds = numQuantity * 1000 * 60 * 60 * 24
             break
-          case 'm':
           case 'month':
           case 'months':
             if (numQuantity <= 60) {
