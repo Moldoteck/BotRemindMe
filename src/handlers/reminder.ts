@@ -61,6 +61,19 @@ async function handleMsg(ctx: Context, text: string) {
             informationSet = true
             timeoutSeconds = numQuantity * 1000 * 60 * 60 * 24
             break
+          case 'm':
+          case 'month':
+          case 'months':
+            if (numQuantity <= 60) {
+              date.setDate(date.getDate() + numQuantity)
+              informationSet = true
+              timeoutSeconds = numQuantity * 1000 * 60 * 60 * 24 * 30 //30days
+            } else {
+              ctx.reply('Number too big').catch((err) => {
+                console.log(err)
+              })
+            }
+            break
           default:
             ctx.reply('Invalid unit type').catch((err) => {
               console.log(err)
