@@ -213,7 +213,7 @@ export async function handleList(ctx: Context) {
 
     let timeRemaining = `${days}d ${hours}h ${minutes}m ${seconds}s`
 
-    let finalMessage = `Reminder for ${username}\nWill trigger on: ${date.toDateString()}\nafter ${timeRemaining}:${msg}${repl}`
+    let finalMessage = `Reminder for${username}\nWill trigger on: ${date.toDateString()}\nin ${timeRemaining}:${msg}${repl}`
     if (
       ctx?.dbchat?.id == ctx.dbuser.id ||
       ctx.dbchat?.id?.toString() == reminder.chatID
