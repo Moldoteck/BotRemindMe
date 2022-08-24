@@ -1,4 +1,4 @@
-import { sendMessageTimeout } from '@/helpers/sendReminder'
+import { sendMessageChat, sendMessageTimeout } from '@/helpers/sendReminder'
 import Context from '@/models/Context'
 import { MessageChat } from '@/models/User'
 import { v4 as uuidv4 } from 'uuid'
@@ -170,6 +170,34 @@ export async function handleTextRemind(ctx: Context) {
     let text: string = ctx.msg.text.split('!remindme ')[1]
     if (text) {
       handleMsg(ctx, text)
+    }
+  }
+}
+
+export async function handleList(ctx: Context) {
+  let remindersID = Object.keys(ctx.dbuser.reminders)
+  for (let key of remindersID) {
+    let reminder = ctx.dbuser.reminders[key]
+
+    //message and reply
+    let message = reminder.message
+    let reply = reminder.reply
+
+    let msg = message == '-' ? '' : `\n\n${message}`
+    let repl = reply ? `\n\n${reply}` : ''
+    let username = ctx.dbuser.username != '' ? ` @${ctx.dbuser.username}` : ''
+    let finalMessage = `Reminder for ${username}:${msg}${repl}`
+    if (
+      ctx?.dbchat?.id == ctx.dbuser.id ||
+      ctx.dbchat?.id?.toString() == reminder.chatID
+    ) {
+      try {
+        await ctx.reply(finalMessage, {
+          reply_to_message_id: parseInt(ctx.dbuser.reminders[key].message_id),
+        })
+      } catch (err) {
+        console.log(err)
+      }
     }
   }
 }

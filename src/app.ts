@@ -12,7 +12,7 @@ import i18n from '@/helpers/i18n'
 import languageMenu from '@/menus/language'
 import sendHelp, { handleCount } from '@/handlers/help'
 import startMongo from '@/helpers/startMongo'
-import handleRemind, { handleTextRemind } from './handlers/reminder'
+import handleRemind, { handleList, handleTextRemind } from './handlers/reminder'
 import { sendAllMessages } from './helpers/sendReminder'
 import attachChat from './middlewares/attachChat'
 
@@ -36,6 +36,7 @@ async function runApp() {
   bot.command('language', handleLanguage)
   bot.command('remindme', handleRemind)
   bot.command('countChats', handleCount)
+  bot.command('list', handleList)
   bot.on('msg:text', handleTextRemind)
 
   // Errors

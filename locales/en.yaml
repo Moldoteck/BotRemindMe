@@ -7,5 +7,6 @@ help: |
   Supported texts are: s, sec, second, seconds, m, min, minute, minutes, h, hr, hour, hours, d, day, days
   You can also use <b>/remindme</b> as reply to some message, so that both your message and reminder will be saved.
   You can also use <b>!remindme</b> if you want
+  /list - list all reminders in private chat or all group specific reminders in group chat
 language: Please, select the language.
 language_selected: <b>This bot</b> now speaks English.

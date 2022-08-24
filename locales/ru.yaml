@@ -7,5 +7,6 @@ help: |
   Поддерживаемые тексты: s, sec, second, seconds, m, min, minute, minutes, h, hr, hour, hours, d, day, days
   Вы также можете использовать <b>/remindme</b> как ответ на сообщение, так что и ваше сообщение и напоминалка будут сохранены.
   Вы также можете использовать <b>!remindme</b> если хотите
+  /list - list all reminders in private chat or all group specific reminders in group chat
 language: Пожалуйста, выберите язык.
 language_selected: <b>Бот</b> теперь говорит по-русски.
