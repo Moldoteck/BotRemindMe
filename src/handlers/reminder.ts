@@ -186,7 +186,14 @@ export async function handleList(ctx: Context) {
     let msg = message == '-' ? '' : `\n\n${message}`
     let repl = reply ? `\n\n${reply}` : ''
     let username = ctx.dbuser.username != '' ? ` @${ctx.dbuser.username}` : ''
-    let finalMessage = `Reminder for ${username}:${msg}${repl}`
+
+    let timeout = reminder.dateNumber
+    let timeoutNumber = parseInt(timeout)
+    // let remaining = timeoutNumber-Date.now()
+    //remaining to date
+    let date = new Date(timeoutNumber)
+
+    let finalMessage = `Reminder for ${username}\nTriggered on:${date.toDateString()}:${msg}${repl}`
     if (
       ctx?.dbchat?.id == ctx.dbuser.id ||
       ctx.dbchat?.id?.toString() == reminder.chatID
