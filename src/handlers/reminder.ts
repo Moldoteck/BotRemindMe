@@ -192,9 +192,7 @@ export async function handleList(ctx: Context) {
       ctx.dbchat?.id?.toString() == reminder.chatID
     ) {
       try {
-        await ctx.reply(finalMessage, {
-          reply_to_message_id: parseInt(ctx.dbuser.reminders[key].message_id),
-        })
+        await ctx.reply(finalMessage)
       } catch (err) {
         console.log(err)
       }
