@@ -42,6 +42,7 @@ async function handleMsg(ctx: Context, text: string) {
       let dateNumber = 0
       if (numQuantity && numQuantity < 1000) {
         let date = new Date(Date.now())
+        date.getDate
         let informationSet = false
         let timeoutSeconds = 0
         switch (unit) {
@@ -76,10 +77,26 @@ async function handleMsg(ctx: Context, text: string) {
             informationSet = true
             timeoutSeconds = numQuantity * 1000 * 60 * 60 * 24
             break
+          case 'w':
+          case 'wk':
+          case 'week':
+          case 'weeks':
+            if (numQuantity <= 260) {
+              date.setDate(date.getDate() + 7 * numQuantity)
+              informationSet = true
+              timeoutSeconds = numQuantity * 1000 * 60 * 60 * 24 * 7 //7days
+            } else {
+              ctx.reply('Number too big').catch((err) => {
+                console.log(err)
+              })
+            }
+            break
+          case 'mo':
+          case 'mon':
           case 'month':
           case 'months':
             if (numQuantity <= 60) {
-              date.setDate(date.getDate() + numQuantity)
+              date.setDate(date.getDate() + 30 * numQuantity)
               informationSet = true
               timeoutSeconds = numQuantity * 1000 * 60 * 60 * 24 * 30 //30days
             } else {
