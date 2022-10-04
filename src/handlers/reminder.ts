@@ -18,12 +18,27 @@ export function recursiveTimeout(func: () => void, timeout: number) {
 async function handleMsg(ctx: Context, text: string) {
   if (ctx.msg) {
     let textArray = text.split(' ')
-    let quantity = textArray[0]
     let unit = textArray[1]
+
+    let quantity = textArray[0]
+    let numQuantity = Number(quantity)
+    if (isNaN(numQuantity)) {
+      //get first digits of number
+      let firstDigits = quantity.match(/\d+/)
+      if (firstDigits && Number(quantity[0])) {
+        //if first digit is number
+        numQuantity = Number(firstDigits)
+        numQuantity = Math.abs(numQuantity)
+        //try get the unit
+        let firstNonDigitPosition = quantity.search(/\D/)
+        unit = quantity.substring(firstNonDigitPosition)
+      }
+    } else {
+      numQuantity = Math.abs(numQuantity)
+    }
+
     let message = textArray.slice(2).join(' ')
     if (quantity && unit) {
-      let numQuantity = parseInt(quantity)
-      numQuantity = Math.abs(numQuantity)
       let dateNumber = 0
       if (numQuantity && numQuantity < 1000) {
         let date = new Date(Date.now())
