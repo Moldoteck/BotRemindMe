@@ -12,7 +12,12 @@ import i18n from '@/helpers/i18n'
 import languageMenu from '@/menus/language'
 import sendHelp, { handleCount } from '@/handlers/help'
 import startMongo from '@/helpers/startMongo'
-import handleRemind, { handleList, handleTextRemind } from './handlers/reminder'
+import handleRemind, {
+  handleInline,
+  handleInlineResult,
+  handleList,
+  handleTextRemind,
+} from './handlers/reminder'
 import { sendAllMessages } from './helpers/sendReminder'
 import attachChat from './middlewares/attachChat'
 
@@ -38,6 +43,10 @@ async function runApp() {
   bot.command('countChats', handleCount)
   bot.command('list', handleList)
   bot.on('msg:text', handleTextRemind)
+
+  //match number space text or numbertext
+  bot.inlineQuery(/^(((\d+)\s(.+))|((\d+)([a-zA-Z])(.*)))$/, handleInline)
+  bot.on('chosen_inline_result', handleInlineResult)
 
   // Errors
   bot.catch(console.error)

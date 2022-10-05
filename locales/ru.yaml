@@ -10,6 +10,6 @@ help: |
   Вы также можете использовать <b>!remindme</b> если хотите
   /list - list all reminders in private chat or all group specific reminders in group chat
   Все поддерживаемые единицы времени: s, sec, second, seconds | m, min, minute, minutes | h, hr, hour, hours | d, day, days | w, wk, week, weeks | mo, mon, month, months
-  Extra long reminders are not supported to avoid abuse (mode than 60 months)
+  Очень долгие напоминалки не поддерживаются, чтобы избежать злоупотреблений (более 60 месяцев)
 language: Пожалуйста, выберите язык.
 language_selected: <b>Бот</b> теперь говорит по-русски.

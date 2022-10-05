@@ -26,6 +26,10 @@ export class User {
 
 const UserModel = getModelForClass(User)
 
+export function findUser(id: number) {
+  return UserModel.findOne({ id })
+}
+
 export function findOrCreateUser(id: number) {
   return UserModel.findOneAndUpdate(
     { id },
