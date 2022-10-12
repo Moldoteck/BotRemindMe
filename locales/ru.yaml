@@ -11,6 +11,7 @@ help: |
   /list - list all reminders in private chat or all group specific reminders in group chat
   Все поддерживаемые единицы времени: s, sec, second, seconds | m, min, minute, minutes | h, hr, hour, hours | d, day, days | w, wk, week, weeks | mo, mon, month, months
   Очень долгие напоминалки не поддерживаются, чтобы избежать злоупотреблений (более 60 месяцев)
+  Инлайн напоминалки могут быть созданы написав: @BotRemindMeBot 5m Привет...., где .... сохранит напоминалку
 language: Пожалуйста, выберите язык.
 language_selected: <b>Бот</b> теперь говорит по-русски.
 saving_attempt: Попытка сохранения...

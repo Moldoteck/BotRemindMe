@@ -11,6 +11,7 @@ help: |
   /list - list all reminders in private chat or all group specific reminders in group chat
   All supported units: s, sec, second, seconds | m, min, minute, minutes | h, hr, hour, hours | d, day, days | w, wk, week, weeks | mo, mon, month, months
   Extra long reminders are not supported to avoid abuse (mode than 60 months)
+  Inline reminder can be set by typing: @BotRemindMeBot 5m Hello...., where .... will save the reminder
 language: Please, select the language.
 language_selected: <b>This bot</b> now speaks English.
 saving_attempt: Saving attempt...
