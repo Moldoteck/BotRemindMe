@@ -1,3 +1,4 @@
+import i18n from '@/helpers/i18n'
 import { sendMessageChat, sendMessageTimeout } from '@/helpers/sendReminder'
 import Context from '@/models/Context'
 import { findUser, MessageChat } from '@/models/User'
@@ -282,20 +283,40 @@ export async function handleInline(ctx: Context) {
         let text = (ctx['match'] as RegExpMatchArray).input
         if (text) {
           if (isOk(text)) {
-            return ctx.answerInlineQuery(
-              [
-                {
-                  id: '0',
-                  type: 'article',
-                  title: 'Reminder',
-                  description: `Reminder for ${text}`,
-                  input_message_content: {
-                    message_text: 'Trying to set a reminder',
+            if (text.endsWith('....')) {
+
+              trySaveReminder(ctx, text.substring(0, text.length - 4))
+
+              return ctx.answerInlineQuery(
+                [
+                  {
+                    id: '0',
+                    type: 'article',
+                    title: ctx.i18n.t('saving_attempt'),
+                    description: ctx.i18n.t('private_confirmation'),
+                    input_message_content: {
+                      message_text: '.',
+                    },
                   },
-                },
-              ],
-              { cache_time: 0 }
-            )
+                ],
+                { cache_time: 0 }
+              )
+            } else {
+              return ctx.answerInlineQuery(
+                [
+                  {
+                    id: '0',
+                    type: 'article',
+                    title: ctx.i18n.t('instruction'),
+                    description: ctx.i18n.t('type_end'),
+                    input_message_content: {
+                      message_text: '.',
+                    },
+                  },
+                ],
+                { cache_time: 0 }
+              )
+            }
           } else {
             return ctx.answerInlineQuery(
               [
@@ -422,171 +443,336 @@ function isOk(text: string) {
   return informationSet
 }
 
-export async function handleInlineResult(ctx: Context) {
-  let text = ctx.chosenInlineResult?.query
-  if (ctx.chosenInlineResult && ctx.chosenInlineResult?.result_id == '1') {
-    return
-    //ignore
-  }
-  if (ctx.chosenInlineResult && text) {
-    let textArray = text.split(' ')
-    let unit = textArray[1]
+async function trySaveReminder(ctx: Context, text: string) {
+  // console.log(text)
+  let textArray = text.split(' ')
+  let unit = textArray[1]
 
-    let quantity = textArray[0]
-    let numQuantity = Number(quantity)
-    if (isNaN(numQuantity)) {
-      //get first digits of number
-      let firstDigits = quantity.match(/\d+/)
-      if (firstDigits && Number(quantity[0])) {
-        //if first digit is number
-        numQuantity = Number(firstDigits)
-        numQuantity = Math.abs(numQuantity)
-        //try get the unit
-        let firstNonDigitPosition = quantity.search(/\D/)
-        unit = quantity.substring(firstNonDigitPosition)
-      }
-    } else {
+  let quantity = textArray[0]
+  let numQuantity = Number(quantity)
+  if (isNaN(numQuantity)) {
+    //get first digits of number
+    let firstDigits = quantity.match(/\d+/)
+    if (firstDigits && Number(quantity[0])) {
+      //if first digit is number
+      numQuantity = Number(firstDigits)
       numQuantity = Math.abs(numQuantity)
+      //try get the unit
+      let firstNonDigitPosition = quantity.search(/\D/)
+      unit = quantity.substring(firstNonDigitPosition)
     }
+  } else {
+    numQuantity = Math.abs(numQuantity)
+  }
 
-    let message = textArray.slice(2).join(' ')
-    if (quantity && unit) {
-      let dateNumber = 0
-      if (numQuantity && numQuantity < 1000) {
-        let date = new Date(Date.now())
-        let informationSet = false
-        let timeoutSeconds = 0
-        let replyMessage = ''
-        unit = unit.toLowerCase()
-        switch (unit) {
-          case 's':
-          case 'sec':
-          case 'second':
-          case 'seconds':
-            replyMessage = 'seconds'
-            date.setSeconds(date.getSeconds() + numQuantity)
+  let message = textArray.slice(isNaN(Number(quantity)) ? 1 : 2).join(' ')
+  // console.log(message)
+  if (quantity && unit && ctx.from?.id) {
+    let dateNumber = 0
+    if (numQuantity && numQuantity < 1000) {
+      let date = new Date(Date.now())
+      let informationSet = false
+      let timeoutSeconds = 0
+      let replyMessage = ''
+      unit = unit.toLowerCase()
+      switch (unit) {
+        case 's':
+        case 'sec':
+        case 'second':
+        case 'seconds':
+          replyMessage = 'seconds'
+          date.setSeconds(date.getSeconds() + numQuantity)
+          informationSet = true
+          timeoutSeconds = numQuantity * 1000
+          break
+        case 'm':
+        case 'min':
+        case 'minute':
+        case 'minutes':
+          replyMessage = 'minutes'
+          date.setMinutes(date.getMinutes() + numQuantity)
+          informationSet = true
+          timeoutSeconds = numQuantity * 1000 * 60
+          break
+        case 'h':
+        case 'hr':
+        case 'hour':
+        case 'hours':
+          replyMessage = 'hours'
+          date.setHours(date.getHours() + numQuantity)
+          informationSet = true
+          timeoutSeconds = numQuantity * 1000 * 60 * 60
+          break
+        case 'd':
+        case 'day':
+        case 'days':
+          replyMessage = 'days'
+          date.setDate(date.getDate() + numQuantity)
+          informationSet = true
+          timeoutSeconds = numQuantity * 1000 * 60 * 60 * 24
+          break
+        case 'w':
+        case 'wk':
+        case 'week':
+        case 'weeks':
+          replyMessage = 'weeks'
+          if (numQuantity <= 260) {
+            date.setDate(date.getDate() + 7 * numQuantity)
             informationSet = true
-            timeoutSeconds = numQuantity * 1000
-            break
-          case 'm':
-          case 'min':
-          case 'minute':
-          case 'minutes':
-            replyMessage = 'minutes'
-            date.setMinutes(date.getMinutes() + numQuantity)
-            informationSet = true
-            timeoutSeconds = numQuantity * 1000 * 60
-            break
-          case 'h':
-          case 'hr':
-          case 'hour':
-          case 'hours':
-            replyMessage = 'hours'
-            date.setHours(date.getHours() + numQuantity)
-            informationSet = true
-            timeoutSeconds = numQuantity * 1000 * 60 * 60
-            break
-          case 'd':
-          case 'day':
-          case 'days':
-            replyMessage = 'days'
-            date.setDate(date.getDate() + numQuantity)
-            informationSet = true
-            timeoutSeconds = numQuantity * 1000 * 60 * 60 * 24
-            break
-          case 'w':
-          case 'wk':
-          case 'week':
-          case 'weeks':
-            replyMessage = 'weeks'
-            if (numQuantity <= 260) {
-              date.setDate(date.getDate() + 7 * numQuantity)
-              informationSet = true
-              timeoutSeconds = numQuantity * 1000 * 60 * 60 * 24 * 7 //7days
-            } else {
-              ctx.reply('Number too big').catch((err) => {
-                console.log(err)
-              })
-            }
-            break
-          case 'mo':
-          case 'mon':
-          case 'month':
-          case 'months':
-            replyMessage = 'months'
-            if (numQuantity <= 60) {
-              date.setDate(date.getDate() + 30 * numQuantity)
-              informationSet = true
-              timeoutSeconds = numQuantity * 1000 * 60 * 60 * 24 * 30 //30days
-            } else {
-              ctx.reply('Number too big').catch((err) => {
-                console.log(err)
-              })
-            }
-            break
-          default:
-            ctx.reply('Invalid unit type').catch((err) => {
+            timeoutSeconds = numQuantity * 1000 * 60 * 60 * 24 * 7 //7days
+          } else {
+            ctx.reply('Number too big').catch((err) => {
               console.log(err)
             })
-            break
-        }
-        if (informationSet) {
-          dateNumber = date.getTime()
-          if (!message) {
-            message = '-'
           }
-          message = sanitize(message)
-
-          let reminderChat: MessageChat = {
-            chatID: ctx.chosenInlineResult?.from.id.toString(),
-            message: message,
-            reply: '',
-            dateNumber: dateNumber.toString(),
-            message_id: '0',
-          }
-
-          let uniqueId = uuidv4()
-          ctx.dbuser.reminders[uniqueId] = reminderChat
-
-          //mark modified
-          ctx.dbuser.markModified('reminders')
-          await ctx.dbuser.save()
-          let repl = reminderChat.reply ? `\n\n${reminderChat.reply}` : ''
-
-          let msg = message == '-' ? '' : `\n\n${message}`
-          let username =
-            ctx.dbuser.username != '' ? ` @${ctx.dbuser.username}` : ''
-          let finalMessage = `Reminder for${username}:${msg}${repl}`
-          let chatid = ctx.chosenInlineResult?.from.id.toString()
-
-          ctx.api
-            .sendMessage(
-              ctx.chosenInlineResult?.from.id,
-              `Ok, will remind you in ${numQuantity} ${replyMessage} this: ${message}`
-            )
-            .catch((err) => {
+          break
+        case 'mo':
+        case 'mon':
+        case 'month':
+        case 'months':
+          replyMessage = 'months'
+          if (numQuantity <= 60) {
+            date.setDate(date.getDate() + 30 * numQuantity)
+            informationSet = true
+            timeoutSeconds = numQuantity * 1000 * 60 * 60 * 24 * 30 //30days
+          } else {
+            ctx.reply('Number too big').catch((err) => {
               console.log(err)
             })
-
-          recursiveTimeout(() => {
-            sendMessageTimeout(
-              ctx,
-              chatid.toString(),
-              finalMessage,
-              ctx.dbuser.id,
-              uniqueId
-            )
-          }, timeoutSeconds)
+          }
+          break
+        default:
+          ctx.reply('Invalid unit type').catch((err) => {
+            console.log(err)
+          })
+          break
+      }
+      if (informationSet) {
+        dateNumber = date.getTime()
+        if (!message) {
+          message = '-'
         }
-      } else {
-        ctx.reply('Invalid number or too big').catch((err) => {
-          console.log(err)
-        })
+        message = sanitize(message)
+
+        let reminderChat: MessageChat = {
+          chatID: ctx.from?.id.toString(),
+          message: message,
+          reply: '',
+          dateNumber: dateNumber.toString(),
+          message_id: '0',
+        }
+
+        let uniqueId = uuidv4()
+        ctx.dbuser.reminders[uniqueId] = reminderChat
+
+        //mark modified
+        ctx.dbuser.markModified('reminders')
+        await ctx.dbuser.save()
+        let repl = reminderChat.reply ? `\n\n${reminderChat.reply}` : ''
+
+        let msg = message == '-' ? '' : `\n\n${message}`
+        let username =
+          ctx.dbuser.username != '' ? ` @${ctx.dbuser.username}` : ''
+        let finalMessage = `Reminder for${username}:${msg}${repl}`
+        let chatid = ctx.chosenInlineResult?.from.id.toString()
+
+        ctx.api
+          .sendMessage(
+            ctx.from.id,
+            `Ok, will remind you in ${numQuantity} ${replyMessage} this: ${message}`
+          )
+          .catch((err) => {
+            console.log(err)
+          })
+
+        recursiveTimeout(() => {
+          sendMessageTimeout(
+            ctx,
+            ctx.dbuser.id.toString(),
+            finalMessage,
+            ctx.dbuser.id,
+            uniqueId
+          )
+        }, timeoutSeconds)
       }
     } else {
-      ctx.reply('Ill formated message').catch((err) => {
+      ctx.reply('Invalid number or too big').catch((err) => {
         console.log(err)
       })
     }
+  } else {
+    ctx.reply('Ill formated message').catch((err) => {
+      console.log(err)
+    })
   }
+}
+
+
+export async function handleInlineResult(ctx: Context) {
+  // let text = ctx.chosenInlineResult?.query
+  // if (ctx.chosenInlineResult && ctx.chosenInlineResult?.result_id == '1') {
+  //   return
+  //   //ignore
+  // }
+  // if (ctx.chosenInlineResult && text) {
+  //   let textArray = text.split(' ')
+  //   let unit = textArray[1]
+
+  //   let quantity = textArray[0]
+  //   let numQuantity = Number(quantity)
+  //   if (isNaN(numQuantity)) {
+  //     //get first digits of number
+  //     let firstDigits = quantity.match(/\d+/)
+  //     if (firstDigits && Number(quantity[0])) {
+  //       //if first digit is number
+  //       numQuantity = Number(firstDigits)
+  //       numQuantity = Math.abs(numQuantity)
+  //       //try get the unit
+  //       let firstNonDigitPosition = quantity.search(/\D/)
+  //       unit = quantity.substring(firstNonDigitPosition)
+  //     }
+  //   } else {
+  //     numQuantity = Math.abs(numQuantity)
+  //   }
+
+  //   let message = textArray.slice(2).join(' ')
+  //   if (quantity && unit) {
+  //     let dateNumber = 0
+  //     if (numQuantity && numQuantity < 1000) {
+  //       let date = new Date(Date.now())
+  //       let informationSet = false
+  //       let timeoutSeconds = 0
+  //       let replyMessage = ''
+  //       unit = unit.toLowerCase()
+  //       switch (unit) {
+  //         case 's':
+  //         case 'sec':
+  //         case 'second':
+  //         case 'seconds':
+  //           replyMessage = 'seconds'
+  //           date.setSeconds(date.getSeconds() + numQuantity)
+  //           informationSet = true
+  //           timeoutSeconds = numQuantity * 1000
+  //           break
+  //         case 'm':
+  //         case 'min':
+  //         case 'minute':
+  //         case 'minutes':
+  //           replyMessage = 'minutes'
+  //           date.setMinutes(date.getMinutes() + numQuantity)
+  //           informationSet = true
+  //           timeoutSeconds = numQuantity * 1000 * 60
+  //           break
+  //         case 'h':
+  //         case 'hr':
+  //         case 'hour':
+  //         case 'hours':
+  //           replyMessage = 'hours'
+  //           date.setHours(date.getHours() + numQuantity)
+  //           informationSet = true
+  //           timeoutSeconds = numQuantity * 1000 * 60 * 60
+  //           break
+  //         case 'd':
+  //         case 'day':
+  //         case 'days':
+  //           replyMessage = 'days'
+  //           date.setDate(date.getDate() + numQuantity)
+  //           informationSet = true
+  //           timeoutSeconds = numQuantity * 1000 * 60 * 60 * 24
+  //           break
+  //         case 'w':
+  //         case 'wk':
+  //         case 'week':
+  //         case 'weeks':
+  //           replyMessage = 'weeks'
+  //           if (numQuantity <= 260) {
+  //             date.setDate(date.getDate() + 7 * numQuantity)
+  //             informationSet = true
+  //             timeoutSeconds = numQuantity * 1000 * 60 * 60 * 24 * 7 //7days
+  //           } else {
+  //             ctx.reply('Number too big').catch((err) => {
+  //               console.log(err)
+  //             })
+  //           }
+  //           break
+  //         case 'mo':
+  //         case 'mon':
+  //         case 'month':
+  //         case 'months':
+  //           replyMessage = 'months'
+  //           if (numQuantity <= 60) {
+  //             date.setDate(date.getDate() + 30 * numQuantity)
+  //             informationSet = true
+  //             timeoutSeconds = numQuantity * 1000 * 60 * 60 * 24 * 30 //30days
+  //           } else {
+  //             ctx.reply('Number too big').catch((err) => {
+  //               console.log(err)
+  //             })
+  //           }
+  //           break
+  //         default:
+  //           ctx.reply('Invalid unit type').catch((err) => {
+  //             console.log(err)
+  //           })
+  //           break
+  //       }
+  //       if (informationSet) {
+  //         dateNumber = date.getTime()
+  //         if (!message) {
+  //           message = '-'
+  //         }
+  //         message = sanitize(message)
+
+  //         let reminderChat: MessageChat = {
+  //           chatID: ctx.chosenInlineResult?.from.id.toString(),
+  //           message: message,
+  //           reply: '',
+  //           dateNumber: dateNumber.toString(),
+  //           message_id: '0',
+  //         }
+
+  //         let uniqueId = uuidv4()
+  //         ctx.dbuser.reminders[uniqueId] = reminderChat
+
+  //         //mark modified
+  //         ctx.dbuser.markModified('reminders')
+  //         await ctx.dbuser.save()
+  //         let repl = reminderChat.reply ? `\n\n${reminderChat.reply}` : ''
+
+  //         let msg = message == '-' ? '' : `\n\n${message}`
+  //         let username =
+  //           ctx.dbuser.username != '' ? ` @${ctx.dbuser.username}` : ''
+  //         let finalMessage = `Reminder for${username}:${msg}${repl}`
+  //         let chatid = ctx.chosenInlineResult?.from.id.toString()
+
+  //         ctx.api
+  //           .sendMessage(
+  //             ctx.chosenInlineResult?.from.id,
+  //             `Ok, will remind you in ${numQuantity} ${replyMessage} this: ${message}`
+  //           )
+  //           .catch((err) => {
+  //             console.log(err)
+  //           })
+
+  //         recursiveTimeout(() => {
+  //           sendMessageTimeout(
+  //             ctx,
+  //             chatid.toString(),
+  //             finalMessage,
+  //             ctx.dbuser.id,
+  //             uniqueId
+  //           )
+  //         }, timeoutSeconds)
+  //       }
+  //     } else {
+  //       ctx.reply('Invalid number or too big').catch((err) => {
+  //         console.log(err)
+  //       })
+  //     }
+  //   } else {
+  //     ctx.reply('Ill formated message').catch((err) => {
+  //       console.log(err)
+  //     })
+  //   }
+  // }
 }

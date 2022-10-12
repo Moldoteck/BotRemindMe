@@ -13,3 +13,7 @@ help: |
   Extra long reminders are not supported to avoid abuse (mode than 60 months)
 language: Please, select the language.
 language_selected: <b>This bot</b> now speaks English.
+saving_attempt: Saving attempt...
+private_confirmation: Check your private chat with bot for confirmation
+instruction: Instruction
+type_end: Type .... at the end to save the reminder
