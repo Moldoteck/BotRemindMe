@@ -17,6 +17,7 @@ import handleRemind, {
   handleInlineResult,
   handleList,
   handleTextRemind,
+  notifyAllChats,
 } from './handlers/reminder'
 import { sendAllMessages } from './helpers/sendReminder'
 import attachChat from './middlewares/attachChat'
@@ -42,6 +43,7 @@ async function runApp() {
   bot.command('remindme', handleRemind)
   bot.command('countChats', handleCount)
   bot.command('list', handleList)
+  bot.command('notify', notifyAllChats)
   bot.on('msg:text', handleTextRemind)
 
   //match number space text or numbertext

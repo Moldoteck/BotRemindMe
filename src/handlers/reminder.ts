@@ -1,7 +1,8 @@
 import i18n from '@/helpers/i18n'
 import { sendMessageChat, sendMessageTimeout } from '@/helpers/sendReminder'
+import { findAllChats } from '@/models/Chat'
 import Context from '@/models/Context'
-import { findUser, MessageChat } from '@/models/User'
+import { findAllUsers, findUser, MessageChat } from '@/models/User'
 import { v4 as uuidv4 } from 'uuid'
 var sanitize = require('mongo-sanitize')
 
@@ -775,4 +776,33 @@ export async function handleInlineResult(ctx: Context) {
   //     })
   //   }
   // }
+}
+
+export async function notifyAllChats(ctx: Context) {
+  if (ctx.from?.id == 180001222 && ctx.message?.reply_to_message?.text) {
+    let msg = ctx.message.reply_to_message.text
+    if (msg) {
+      // let users = await findAllUsers()
+      let chats = await findAllChats()
+      for (let privateUser of chats) {
+        let canSend = false
+        try {
+          await ctx.replyWithChatAction("typing")
+          canSend = true
+        } catch (err) {
+          console.log(err)
+        }
+        if (canSend) {
+          ctx.api.sendMessage(privateUser.id, msg).catch((err) => {
+            console.log(err)
+            ctx.reply(err.message).catch((err) => {
+              console.log(err)
+            })
+          })
+          //sleep 1 second
+          await new Promise((resolve) => setTimeout(resolve, 1000))
+        }
+      }
+    }
+  }
 }
