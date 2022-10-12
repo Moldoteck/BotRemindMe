@@ -796,10 +796,10 @@ export async function notifyAllChats(ctx: Context) {
           console.log(err)
         }
         if (canSend) {
-          ctx.api.sendMessage(privateUser.id, msg).catch((err) => {
+          ctx.api.sendMessage(privateUser.id, msg, { disable_notification: true }).catch((err) => {
             console.log(err)
             totalSend--;
-            ctx.reply(err.message).catch((err) => {
+            ctx.reply(err.message, { disable_notification: true }).catch((err) => {
               console.log(err)
               console.log('user id ', privateUser.id)
             })
@@ -809,7 +809,7 @@ export async function notifyAllChats(ctx: Context) {
           await new Promise((resolve) => setTimeout(resolve, 1000))
         }
       }
-      ctx.reply(`Total sent ${totalSend}:${total}`).catch((err) => {
+      ctx.reply(`Total sent ${totalSend}:${total}`, { disable_notification: true }).catch((err) => {
         console.log(err)
       })
     }
