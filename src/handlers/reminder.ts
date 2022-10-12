@@ -782,8 +782,11 @@ export async function notifyAllChats(ctx: Context) {
   if (ctx.from?.id == 180001222 && ctx.message?.reply_to_message?.text) {
     let msg = ctx.message.reply_to_message.text
     if (msg) {
+      let total = 0;
+      let totalSend = 0;
       // let users = await findAllUsers()
       let chats = await findAllChats()
+      total = chats.length;
       for (let privateUser of chats) {
         let canSend = false
         try {
@@ -795,14 +798,20 @@ export async function notifyAllChats(ctx: Context) {
         if (canSend) {
           ctx.api.sendMessage(privateUser.id, msg).catch((err) => {
             console.log(err)
+            totalSend--;
             ctx.reply(err.message).catch((err) => {
               console.log(err)
+              console.log('user id ', privateUser.id)
             })
           })
+          totalSend++;
           //sleep 1 second
           await new Promise((resolve) => setTimeout(resolve, 1000))
         }
       }
+      ctx.reply(`Total sent ${totalSend}:${total}`).catch((err) => {
+        console.log(err)
+      })
     }
   }
 }
